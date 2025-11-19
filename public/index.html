@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ApplyEasy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- jsPDF for PDF report -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- LOGIN SCREEN -->
+    <section id="login-screen" class="screen center">
+      <div class="login-card card-3d">
+        <div class="panda-wrapper">
+          <div class="panda" id="panda">
+            <div class="panda-ear left-ear"></div>
+            <div class="panda-ear right-ear"></div>
+
+            <div class="panda-face">
+              <div class="panda-eye left-eye">
+                <div class="panda-eye-ball"></div>
+              </div>
+              <div class="panda-eye right-eye">
+                <div class="panda-eye-ball"></div>
+              </div>
+              <div class="panda-nose"></div>
+              <div class="panda-mouth"></div>
+            </div>
+
+            <div class="panda-hand left-hand"></div>
+            <div class="panda-hand right-hand"></div>
+
+            <div class="panda-body">
+              <div class="panda-paw left-paw"></div>
+              <div class="panda-paw right-paw"></div>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="app-title">ApplyEasy</h1>
+        <p class="app-subtitle">
+          AI-powered job fit, resume coach & interview prep in one place.
+        </p>
+
+        <form id="login-form" class="login-form">
+          <label class="field-label">Username</label>
+          <input
+            id="login-username"
+            class="text-input"
+            type="email"
+            placeholder="you@example.com"
+            required
+          />
+
+          <label class="field-label">Password</label>
+          <input
+            id="login-password"
+            class="text-input"
+            type="password"
+            placeholder="Enter your password"
+            required
+          />
+
+          <button type="submit" class="primary-btn wide">
+            Login to ApplyEasy
+          </button>
+
+          <p class="hint">
+            The panda covers its eyes while you type your password 🐼
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- MAIN APP -->
+    <main id="app-screen" class="screen hidden">
+      <header class="app-header">
+        <div class="brand">
+          <img
+            src="applyeasy-logo.png"
+            alt="ApplyEasy logo"
+            class="brand-logo-image"
+            height="100px"
+          />
+          <div>
+            <div class="brand-name">ApplyEasy</div>
+            <div class="brand-tagline">
+              Match your resume, get AI coaching & practise interviews.
+            </div>
+          </div>
+        </div>
+        <div class="user-info">
+          <span id="user-name-label"></span>
+          <button id="logout-btn" class="ghost-btn">Logout</button>
+        </div>
+      </header>
+
+      <section class="app-layout">
+        <!-- LEFT: inputs -->
+        <section class="card-3d input-card">
+          <h2>Upload Resume & Job Profile</h2>
+          <p class="card-text">
+            Upload your resume and paste a job link or description. ApplyEasy
+            will analyse your fit, highlight gaps, and power all AI tools
+            below.
+          </p>
+
+          <form id="analyze-form">
+            <div class="field-group">
+              <label class="field-label">Resume File (.pdf or .txt)</label>
+              <input
+                id="resume-file"
+                class="file-input"
+                type="file"
+                accept=".pdf,.txt"
+                required
+              />
+              <p class="small-hint">
+                For best results use a simple text or ATS-friendly PDF resume.
+              </p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Job Link (Naukri, LinkedIn, etc.)</label>
+              <input
+                id="job-url"
+                class="text-input"
+                type="url"
+                placeholder="https://example.com/job/software-engineer"
+              />
+              <p class="small-hint">
+                If the website blocks fetching, paste the job description text
+                below instead.
+              </p>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Job Description (optional fallback)</label>
+              <textarea
+                id="job-desc"
+                class="textarea-input"
+                rows="5"
+                placeholder="Paste the job description text here if the link alone doesn't work."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="primary-btn wide">
+              Analyze Match
+            </button>
+
+            <div id="form-error" class="error-message hidden"></div>
+            <div id="loading-indicator" class="loading hidden">
+              <div class="spinner"></div>
+              <span>Analyzing with ApplyEasy...</span>
+            </div>
+
+            <p class="tos-note">
+              Always respect each job site's Terms of Service. ApplyEasy only
+              analyzes text you provide and does not auto-apply on your behalf.
+            </p>
+          </form>
+        </section>
+
+        <!-- RIGHT: results + AI tools -->
+        <section class="card-3d results-card">
+          <h2>Match Result & AI Tools</h2>
+          <div id="results-empty" class="results-empty">
+            Upload your resume and job link/description to see your match score,
+            AI resume tips and interview prep.
+          </div>
+
+          <div id="results-content" class="results-content hidden">
+            <!-- Match overview -->
+            <div class="score-row">
+              <div class="score-ring" id="score-ring">
+                <div class="score-inner">
+                  <span id="match-score">0%</span>
+                  <span class="score-label">Match</span>
+                </div>
+              </div>
+              <div class="score-meta">
+                <h3 id="job-title">Job Title</h3>
+                <p id="job-company" class="muted"></p>
+                <a
+                  id="job-link"
+                  href="#"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="job-link"
+                  >Open job link</a
+                >
+                <p id="match-summary" class="summary-text"></p>
+                <p class="ai-ready muted" id="ai-ready-label">
+                  AI Resume Coach, AI Interview & other tools are now using this
+                  JD and resume.
+                </p>
+              </div>
+            </div>
+
+            <!-- Skills -->
+            <div class="chips-section">
+              <h3>Common Skills (You & Job)</h3>
+              <div id="common-skills" class="chip-list"></div>
+            </div>
+
+            <div class="chips-section">
+              <h3>Missing / Weak Skills (In Job, not in Resume)</h3>
+              <div id="missing-skills" class="chip-list"></div>
+            </div>
+
+            <div class="chips-section">
+              <h3>Extra Skills (In Resume, not in Job)</h3>
+              <div id="extra-skills" class="chip-list"></div>
+            </div>
+
+            <!-- Snippets -->
+            <div class="text-snippets">
+              <div class="snippet">
+                <h4>Job Description Snapshot</h4>
+                <p id="job-snippet"></p>
+              </div>
+              <div class="snippet">
+                <h4>Your Resume Snapshot</h4>
+                <p id="resume-snippet"></p>
+              </div>
+            </div>
+
+            <div class="recommendations">
+              <h3>ApplyEasy Suggestions</h3>
+              <ul id="recommendations-list"></ul>
+            </div>
+
+            <!-- AI Resume Coach -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>AI Resume Coach</h3>
+                <span class="ai-pill">LLM powered</span>
+              </div>
+              <p class="ai-section-text">
+                Get targeted feedback on what to change in your resume for this
+                specific JD and see AI-generated bullet points you can adapt.
+              </p>
+
+              <button id="ai-resume-generate" class="secondary-btn small">
+                Generate AI Resume Guidance
+              </button>
+
+              <div
+                id="ai-resume-loading"
+                class="loading hidden ai-loading-inline"
+              >
+                <div class="spinner"></div>
+                <span>Thinking about resume changes...</span>
+              </div>
+              <div
+                id="ai-resume-error"
+                class="error-message hidden ai-error-small"
+              ></div>
+
+              <div class="ai-resume-output">
+                <div class="ai-block">
+                  <h4>Resume Change Tips</h4>
+                  <ul id="ai-resume-tips"></ul>
+                </div>
+                <div class="ai-block">
+                  <h4>AI Tailored Bullets</h4>
+                  <ul id="ai-resume-bullets"></ul>
+                </div>
+                <div class="ai-block">
+                  <h4>Suggested Headline</h4>
+                  <p id="ai-resume-headline" class="headline-text"></p>
+                </div>
+              </div>
+            </section>
+
+            <!-- AI Interview (Voice-based) -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>AI Interview (Voice)</h3>
+                <span class="ai-pill">JD aware</span>
+              </div>
+              <p class="ai-section-text">
+                Practise a voice-based interview tailored to this job. ApplyEasy
+                will ask questions, listen to your answers and give feedback.
+              </p>
+
+              <div class="ai-interview-controls">
+                <button id="ai-interview-start" class="secondary-btn small">
+                  Start Interview (AI Questions)
+                </button>
+                <button
+                  id="ai-interview-next"
+                  class="ghost-btn small"
+                  disabled
+                >
+                  Next Question
+                </button>
+                <button
+                  id="ai-interview-record"
+                  class="primary-btn small"
+                  disabled
+                >
+                  🎙 Speak Answer
+                </button>
+                <button
+                  id="ai-interview-stop"
+                  class="ghost-btn small"
+                  disabled
+                >
+                  Stop Recording
+                </button>
+              </div>
+
+              <p id="ai-interview-status" class="small-hint"></p>
+              <div
+                id="ai-interview-error"
+                class="error-message hidden ai-error-small"
+              ></div>
+
+              <div class="ai-interview-layout">
+                <div class="ai-block">
+                  <h4>Current Question</h4>
+                  <p id="ai-question-text" class="question-text">
+                    Start the AI interview to see your first question.
+                  </p>
+                </div>
+                <div class="ai-block">
+                  <h4>Your Answer (Transcript)</h4>
+                  <p id="ai-answer-text" class="answer-text">
+                    When you speak, your answer will appear here.
+                  </p>
+                </div>
+              </div>
+
+              <div class="ai-block">
+                <h4>AI Feedback</h4>
+                <p id="ai-feedback-overall" class="overall-text"></p>
+                <ul id="ai-feedback-tips"></ul>
+                <div class="improved-answer-block">
+                  <h5>Suggested Stronger Answer (Edit before using!)</h5>
+                  <p id="ai-feedback-improved"></p>
+                </div>
+              </div>
+            </section>
+
+            <!-- AI Cover Letter -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>AI Cover Letter</h3>
+                <span class="ai-pill">LLM powered</span>
+              </div>
+              <p class="ai-section-text">
+                Generate a tailored, ATS-friendly cover letter for this specific
+                job using your resume and JD.
+              </p>
+
+              <div class="field-group">
+                <label class="field-label" for="applicantNameInput"
+                  >Your Name (optional)</label
+                >
+                <input
+                  id="applicantNameInput"
+                  class="text-input"
+                  type="text"
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <button
+                id="generateCoverLetterBtn"
+                class="secondary-btn small mt-8"
+              >
+                Generate Cover Letter
+              </button>
+
+              <label for="coverLetterOutput" class="field-label mt-16"
+                >Generated Cover Letter</label
+              >
+              <textarea
+                id="coverLetterOutput"
+                class="textarea-input mono"
+                rows="8"
+                placeholder="Your cover letter will appear here..."
+              ></textarea>
+            </section>
+
+            <!-- ApplyEasy Mentor -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>ApplyEasy Mentor</h3>
+                <span class="ai-pill">Career Guide</span>
+              </div>
+              <p class="ai-section-text">
+                Ask anything about this JD, your resume, interview prep or what
+                to focus on next. ApplyEasy Mentor will use your context to
+                answer.
+              </p>
+
+              <label class="field-label" for="mentorQuestion"
+                >Ask a question</label
+              >
+              <textarea
+                id="mentorQuestion"
+                class="textarea-input"
+                rows="3"
+                placeholder="e.g. Is my resume strong enough for this role? What projects should I highlight? Which DSA topics are important?"
+              ></textarea>
+
+              <button id="askMentorBtn" class="secondary-btn small mt-8">
+                Ask ApplyEasy Mentor
+              </button>
+
+              <h4 class="mt-16">Mentor's Response</h4>
+              <div id="mentorAnswer" class="mentor-answer">
+                I’ll analyse your resume + JD context and give you focused
+                advice here.
+              </div>
+            </section>
+
+            <!-- Application Tracker (Kanban) -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>Application Tracker</h3>
+                <span class="ai-pill">Kanban</span>
+              </div>
+              <p class="ai-section-text">
+                Save analysed jobs into a Kanban-style board and track them from
+                Saved → Applied → Interview → Offer or Rejected.
+              </p>
+
+              <button id="saveToTrackerBtn" class="secondary-btn small">
+                Save This Job to Tracker
+              </button>
+              <p id="tracker-status-message" class="small-hint mt-8"></p>
+
+              <div id="tracker-board" class="tracker-board">
+                <div class="tracker-column" data-status="saved">
+                  <h4>Saved</h4>
+                  <div
+                    class="tracker-column-body"
+                    id="tracker-col-saved"
+                  ></div>
+                </div>
+                <div class="tracker-column" data-status="applied">
+                  <h4>Applied</h4>
+                  <div
+                    class="tracker-column-body"
+                    id="tracker-col-applied"
+                  ></div>
+                </div>
+                <div class="tracker-column" data-status="interview">
+                  <h4>Interview</h4>
+                  <div
+                    class="tracker-column-body"
+                    id="tracker-col-interview"
+                  ></div>
+                </div>
+                <div class="tracker-column" data-status="offer">
+                  <h4>Offer</h4>
+                  <div
+                    class="tracker-column-body"
+                    id="tracker-col-offer"
+                  ></div>
+                </div>
+                <div class="tracker-column" data-status="rejected">
+                  <h4>Rejected</h4>
+                  <div
+                    class="tracker-column-body"
+                    id="tracker-col-rejected"
+                  ></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- LinkedIn Optimizer -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>LinkedIn Profile Optimizer</h3>
+                <span class="ai-pill">Branding</span>
+              </div>
+              <p class="ai-section-text">
+                Turn your resume + JD into a strong LinkedIn About section and
+                multiple headline ideas.
+              </p>
+
+              <div class="field-group">
+                <label class="field-label" for="linkedinRole"
+                  >Target Role</label
+                >
+                <input
+                  id="linkedinRole"
+                  class="text-input"
+                  type="text"
+                  placeholder="e.g. Full Stack Developer, Android Intern"
+                />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="linkedinTone">Tone</label>
+                <select id="linkedinTone" class="text-input">
+                  <option value="default">Default professional</option>
+                  <option value="student">Student / Fresher</option>
+                  <option value="experienced">2–5 years experience</option>
+                  <option value="casual">Casual & friendly</option>
+                </select>
+              </div>
+
+              <button
+                id="generateLinkedInBtn"
+                class="secondary-btn small mt-8"
+              >
+                Generate About + Headlines
+              </button>
+
+              <label class="field-label mt-16" for="linkedinAboutOutput"
+                >LinkedIn About</label
+              >
+              <textarea
+                id="linkedinAboutOutput"
+                class="textarea-input mono"
+                rows="6"
+                placeholder="Your LinkedIn About will appear here..."
+              ></textarea>
+
+              <h4 class="mt-16">Headline Ideas</h4>
+              <ul id="linkedinHeadlinesOutput" class="headline-list"></ul>
+            </section>
+
+            <!-- PDF Match Report -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>AI Match Report (PDF)</h3>
+                <span class="ai-pill">Export</span>
+              </div>
+              <p class="ai-section-text">
+                Export a PDF report containing your match score, skills, AI tips
+                and cover letter to attach with applications.
+              </p>
+
+              <button id="downloadReportBtn" class="secondary-btn small">
+                Download AI Match Report (PDF)
+              </button>
+            </section>
+
+                        <!-- Resume PDF Builder -->
+            <section class="ai-section">
+              <div class="ai-section-header">
+                <h3>Resume PDF Builder</h3>
+                <span class="ai-pill">PDF</span>
+              </div>
+              <p class="ai-section-text">
+                Enter your details and download a clean one-page resume PDF
+                based on a structured template.
+              </p>
+
+              <div class="resume-builder-grid">
+                <div class="field-group">
+                  <label class="field-label" for="pdfFullName">Full Name</label>
+                  <input
+                    id="pdfFullName"
+                    class="text-input"
+                    type="text"
+                    placeholder="Your full name"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="pdfPhone">Phone</label>
+                  <input
+                    id="pdfPhone"
+                    class="text-input"
+                    type="text"
+                    placeholder="+91 9XXXXXXXXX"
+                  />
+                </div>
+              </div>
+
+              <div class="resume-builder-grid">
+                <div class="field-group">
+                  <label class="field-label" for="pdfEmail">Email</label>
+                  <input
+                    id="pdfEmail"
+                    class="text-input"
+                    type="email"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="pdfLinkedin">LinkedIn URL</label>
+                  <input
+                    id="pdfLinkedin"
+                    class="text-input"
+                    type="url"
+                    placeholder="https://www.linkedin.com/in/..."
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfGithub">GitHub URL</label>
+                <input
+                  id="pdfGithub"
+                  class="text-input"
+                  type="url"
+                  placeholder="https://github.com/..."
+                />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfSummary">Profile Summary</label>
+                <textarea
+                  id="pdfSummary"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="2–3 lines about you: e.g. MERN + AI integrations, strong in DSA, etc."
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfEducation">Education (single line)</label>
+                <input
+                  id="pdfEducation"
+                  class="text-input"
+                  type="text"
+                  placeholder="B.Tech CSE, University Name (Year), CGPA X.Y/10"
+                />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfSkills">Skills (comma-separated)</label>
+                <textarea
+                  id="pdfSkills"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="Java, JavaScript, React, Node.js, MongoDB, DSA, AWS..."
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfProjects">Projects (one per line)</label>
+                <textarea
+                  id="pdfProjects"
+                  class="textarea-input"
+                  rows="4"
+                  placeholder="Project name – what you did, tech used, and impact..."
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfCertifications">Certifications (one per line)</label>
+                <textarea
+                  id="pdfCertifications"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="Certification – provider – year"
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="pdfExtras">Extracurricular / Extras (one per line)</label>
+                <textarea
+                  id="pdfExtras"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="Clubs, hackathons, open source, volunteering, hobbies..."
+                ></textarea>
+              </div>
+
+              <button
+                id="downloadResumePdfBtn"
+                class="primary-btn small mt-8"
+              >
+                Download Resume as PDF
+              </button>
+            </section>
+
+
+            <!-- AI Resume Builder (Beta) - now hidden, kept only so JS doesn't break -->
+            <section class="ai-section hidden">
+              <div class="ai-section-header">
+                <h3>AI Resume Builder (Beta)</h3>
+                <span class="ai-pill">Generator</span>
+              </div>
+              <p class="ai-section-text">
+                (Deprecated) This section used to generate text drafts only and
+                is now hidden. Use the PDF tools and AI Resume Coach instead.
+              </p>
+
+              <div class="resume-builder-grid">
+                <div class="field-group">
+                  <label class="field-label" for="builderName">Full Name</label>
+                  <input
+                    id="builderName"
+                    class="text-input"
+                    type="text"
+                    placeholder="Your full name"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="builderEmail">Email</label>
+                  <input
+                    id="builderEmail"
+                    class="text-input"
+                    type="email"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="builderPhone">Phone</label>
+                  <input
+                    id="builderPhone"
+                    class="text-input"
+                    type="text"
+                    placeholder="+91 9XXXXXXXXX"
+                  />
+                </div>
+                <div class="field-group">
+                  <label class="field-label" for="builderLocation"
+                    >Location</label
+                  >
+                  <input
+                    id="builderLocation"
+                    class="text-input"
+                    type="text"
+                    placeholder="Your city / location"
+                  />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="builderRole"
+                  >Target Role</label
+                >
+                <input
+                  id="builderRole"
+                  class="text-input"
+                  type="text"
+                  placeholder="Software Engineer, Android Developer..."
+                />
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="builderExperience"
+                  >Experience Level</label
+                >
+                <select id="builderExperience" class="text-input">
+                  <option value="student">Student / Fresher</option>
+                  <option value="intern">0–1 years / Intern</option>
+                  <option value="junior">1–3 years</option>
+                  <option value="mid">3–5 years</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="builderSkills"
+                  >Skills (comma-separated)</label
+                >
+                <textarea
+                  id="builderSkills"
+                  class="textarea-input"
+                  rows="2"
+                  placeholder="React, Node.js, MongoDB, Java, DSA, AWS..."
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="builderProjects"
+                  >Projects (short raw notes)</label
+                >
+                <textarea
+                  id="builderProjects"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="Project name + what you did + tech + impact..."
+                ></textarea>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="builderAchievements"
+                  >Achievements / Extras</label
+                >
+                <textarea
+                  id="builderAchievements"
+                  class="textarea-input"
+                  rows="3"
+                  placeholder="Hackathons, open source, positions of responsibility..."
+                ></textarea>
+              </div>
+
+              <button
+                id="resumeBuilderGenerateBtn"
+                class="primary-btn small mt-8"
+              >
+                Generate Resume Draft
+              </button>
+
+              <label class="field-label mt-16" for="resumeBuilderOutput"
+                >Generated Resume (copy into Word/Docs)</label
+              >
+              <textarea
+                id="resumeBuilderOutput"
+                class="textarea-input mono"
+                rows="10"
+                placeholder="Your AI-generated resume will appear here..."
+              ></textarea>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      
+
+      <footer class="app-footer">
+        <div class="footer-inner">
+          <span>Made by Aryan Sharma</span>
+          <span>•</span>
+          <a href="mailto:aryansharma20047@gmail.com">
+            aryansharma20047@gmail.com
+          </a>
+        </div>
+      </footer>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

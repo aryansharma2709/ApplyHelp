@@ -1,0 +1,20 @@
+{
+  "name": "applyeasy",
+  "version": "1.0.0",
+  "description": "ApplyEasy - resume vs job matcher",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "jspdf": "^3.0.3",
+    "mongoose": "^8.20.0",
+    "multer": "^1.4.5-lts.1",
+    "node-fetch": "^2.7.0",
+    "pdf-parse": "^1.1.4",
+    "pdfkit": "^0.17.2"
+  }
+}
