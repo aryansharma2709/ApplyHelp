@@ -96,6 +96,11 @@ You can easily extend this to generate a downloadable “Job Fit Report” for u
 
 > At the moment, “AI” outputs are front-end generated / mocked for demo purposes.  
 > You can plug in a real LLM API (OpenAI, Gemini, etc.) in the JS layer to make it fully AI-powered.
+>
+> <img width="1919" height="1003" alt="Screenshot 2025-11-19 065546" src="https://github.com/user-attachments/assets/ec87366b-942a-4b96-9941-c0905b448be6" />
+<img width="963" height="454" alt="Screenshot 2025-11-19 081149" src="https://github.com/user-attachments/assets/73c0d1cf-e288-4919-b740-e23156b28fe4" />
+
+
 
 ---
 
